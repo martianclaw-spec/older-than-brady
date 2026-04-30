@@ -1,5 +1,5 @@
 import { ageDiffLabel, isOlderThanBrady } from "@/lib/game";
-import { findFeatured, FEATURED_ATHLETES } from "@/lib/featured";
+import { findFeatured } from "@/lib/featured";
 import { PLAYERS } from "@/lib/players";
 import { OG_CONTENT_TYPE, OG_SIZE, renderOG } from "@/lib/og";
 
@@ -7,10 +7,6 @@ export const runtime = "edge";
 export const alt = "Is X Older Than Tom Brady?";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
-
-export function generateImageMetadata() {
-  return FEATURED_ATHLETES.map(() => ({ id: "default" }));
-}
 
 export default async function OG({ params }: { params: { slug: string } }) {
   const f = findFeatured(params.slug);
