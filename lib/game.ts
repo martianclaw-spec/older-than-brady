@@ -110,41 +110,66 @@ function shuffleWith<T>(arr: T[], rand: () => number): T[] {
   return out;
 }
 
-function bucketByCategory(rand: () => number): Record<Category, Player[]> {
-  const groups: Record<Category, Player[]> = {
-    nfl: [],
-    nba: [],
-    mlb: [],
-    golf: [],
-    tennis: [],
-    celebrity: []
+// Each category holds two stacks: `fresh` (not recently seen) and `stale`
+// (recently seen). We always prefer fresh; stale is a fallback so the pool
+// can still be exhausted when freshness alone runs out within a bucket.
+type Bucket = { fresh: Player[]; stale: Player[] };
+type Buckets = Record<Category, Bucket>;
+
+function bucketByCategory(rand: () => number, recent: Set<string>): Buckets {
+  const groups: Buckets = {
+    nfl: { fresh: [], stale: [] },
+    nba: { fresh: [], stale: [] },
+    mlb: { fresh: [], stale: [] },
+    golf: { fresh: [], stale: [] },
+    tennis: { fresh: [], stale: [] },
+    celebrity: { fresh: [], stale: [] }
   };
-  for (const p of PLAYERS) groups[p.category].push(p);
+  for (const p of PLAYERS) {
+    const b = groups[p.category];
+    (recent.has(p.name) ? b.stale : b.fresh).push(p);
+  }
   for (const k of Object.keys(groups) as Category[]) {
-    groups[k] = shuffleWith(groups[k], rand);
+    groups[k].fresh = shuffleWith(groups[k].fresh, rand);
+    groups[k].stale = shuffleWith(groups[k].stale, rand);
   }
   return groups;
 }
 
-function nonEmpty(buckets: Record<Category, Player[]>): Category[] {
-  return (Object.keys(buckets) as Category[]).filter((k) => buckets[k].length > 0);
+function bucketSize(b: Bucket): number {
+  return b.fresh.length + b.stale.length;
 }
 
-// Build a queue of length `n` (or all players, capped) using weighted-by-category
-// sampling without repeats. If the chosen category is exhausted, fall back to
-// any remaining category so the pool is fully consumed.
-function buildWeightedQueue(rand: () => number, n: number): Player[] {
-  const buckets = bucketByCategory(rand);
+function nonEmpty(buckets: Buckets): Category[] {
+  return (Object.keys(buckets) as Category[]).filter((k) => bucketSize(buckets[k]) > 0);
+}
+
+function popFromBucket(b: Bucket): Player {
+  // Prefer fresh; fall back to stale within the same category.
+  return (b.fresh.length > 0 ? b.fresh.pop() : b.stale.pop()) as Player;
+}
+
+// Build a queue of length `n` (capped at pool size) using weighted-by-category
+// sampling without repeats. Within each category, not-recently-seen players
+// come first; recently-seen players are appended as fallback. If the chosen
+// category is exhausted, fall back to any remaining category so the pool is
+// fully consumed.
+function buildWeightedQueue(
+  rand: () => number,
+  n: number,
+  recent: Set<string> = new Set()
+): Player[] {
+  const buckets = bucketByCategory(rand, recent);
   const out: Player[] = [];
   const cap = Math.min(n, PLAYERS.length);
   while (out.length < cap) {
     const remaining = nonEmpty(buckets);
     if (remaining.length === 0) break;
     let cat = pickCategory(rand);
-    if (buckets[cat].length === 0) {
+    if (bucketSize(buckets[cat]) === 0) {
       cat = remaining[Math.floor(rand() * remaining.length)];
     }
-    out.push(buckets[cat].pop()!);
+    out.push(popFromBucket(buckets[cat]));
   }
   return out;
 }
@@ -152,13 +177,15 @@ function buildWeightedQueue(rand: () => number, n: number): Player[] {
 // --- Modes -------------------------------------------------------------
 export const CHALLENGE_ROUNDS = 10;
 
+// Challenge is intentionally NOT filtered by recently-seen: two players with
+// the same seed must get an identical 10-player lineup.
 export function buildChallengeQueue(seed: string): Player[] {
   const rand = mulberry32(hashSeed(seed));
   return buildWeightedQueue(rand, CHALLENGE_ROUNDS);
 }
 
-export function buildSoloQueue(): Player[] {
-  return buildWeightedQueue(Math.random, PLAYERS.length);
+export function buildSoloQueue(recentlySeen: Iterable<string> = []): Player[] {
+  return buildWeightedQueue(Math.random, PLAYERS.length, new Set(recentlySeen));
 }
 
 // Avoid immediate repeat: if last solo player matches first of new queue,

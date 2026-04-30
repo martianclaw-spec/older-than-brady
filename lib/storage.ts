@@ -1,6 +1,9 @@
 const BEST_STREAK_KEY = "otb:bestStreak";
 const LAST_PLAYER_KEY = "otb:lastSoloPlayer";
 const LAST_RESULT_KEY = "otb:lastChallenge";
+const RECENT_SEEN_KEY = "otb:recentSeen";
+
+export const RECENT_SEEN_LIMIT = 50;
 
 export type StoredChallenge = {
   seed: string;
@@ -55,4 +58,35 @@ export function getChallengeResult(): StoredChallenge | null {
   } catch {
     return null;
   }
+}
+
+// Recently-seen player names. Most-recent is at the END of the array.
+// Capped at RECENT_SEEN_LIMIT; pushing an existing name moves it to the end.
+export function getRecentSeen(): string[] {
+  const w = safeWindow();
+  if (!w) return [];
+  const v = w.localStorage.getItem(RECENT_SEEN_KEY);
+  if (!v) return [];
+  try {
+    const parsed = JSON.parse(v);
+    return Array.isArray(parsed) ? parsed.filter((s) => typeof s === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function pushRecentSeen(name: string): string[] {
+  const w = safeWindow();
+  if (!w) return [];
+  const cur = getRecentSeen().filter((n) => n !== name);
+  cur.push(name);
+  const trimmed = cur.length > RECENT_SEEN_LIMIT ? cur.slice(-RECENT_SEEN_LIMIT) : cur;
+  w.localStorage.setItem(RECENT_SEEN_KEY, JSON.stringify(trimmed));
+  return trimmed;
+}
+
+export function clearRecentSeen() {
+  const w = safeWindow();
+  if (!w) return;
+  w.localStorage.removeItem(RECENT_SEEN_KEY);
 }

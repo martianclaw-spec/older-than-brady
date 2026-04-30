@@ -16,6 +16,8 @@ import { BRADY_BIRTH, BRADY_NAME, Player } from "@/lib/players";
 import {
   getBestStreak,
   getLastSoloPlayer,
+  getRecentSeen,
+  pushRecentSeen,
   setBestStreak,
   setLastSoloPlayer
 } from "@/lib/storage";
@@ -30,9 +32,13 @@ export default function SoloPage() {
   const [phase, setPhase] = useState<Phase>("answering");
   const [chosen, setChosen] = useState<Choice | null>(null);
 
-  // Init: build a queue, avoid immediate repeat from prior session
+  // Init: build a queue, deprioritizing recently-seen players, and avoid
+  // immediate repeat from the prior session.
   useEffect(() => {
-    const initial = avoidImmediateRepeat(buildSoloQueue(), getLastSoloPlayer());
+    const initial = avoidImmediateRepeat(
+      buildSoloQueue(getRecentSeen()),
+      getLastSoloPlayer()
+    );
     setQueue(initial);
     setBest(getBestStreak());
   }, []);
@@ -42,7 +48,12 @@ export default function SoloPage() {
   const reshuffleIfNeeded = useCallback(
     (q: Player[], i: number) => {
       if (i < q.length) return { q, i };
-      const next = avoidImmediateRepeat(buildSoloQueue(), q[q.length - 1]?.name ?? null);
+      // Re-read recent-seen so the freshly-pushed names from this run are
+      // factored in when rebuilding the queue.
+      const next = avoidImmediateRepeat(
+        buildSoloQueue(getRecentSeen()),
+        q[q.length - 1]?.name ?? null
+      );
       return { q: next, i: 0 };
     },
     []
@@ -62,6 +73,7 @@ export default function SoloPage() {
     setPhase("revealing");
     const correct = c === correctAnswer(current.birthDate);
     setLastSoloPlayer(current.name);
+    pushRecentSeen(current.name);
     if (correct) {
       const newStreak = streak + 1;
       setStreak(newStreak);
