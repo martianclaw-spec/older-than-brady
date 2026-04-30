@@ -2,6 +2,7 @@ const BEST_STREAK_KEY = "otb:bestStreak";
 const LAST_PLAYER_KEY = "otb:lastSoloPlayer";
 const LAST_RESULT_KEY = "otb:lastChallenge";
 const RECENT_SEEN_KEY = "otb:recentSeen";
+const DAILY_KEY_PREFIX = "otb:daily:";
 
 export const RECENT_SEEN_LIMIT = 50;
 
@@ -89,4 +90,23 @@ export function clearRecentSeen() {
   const w = safeWindow();
   if (!w) return;
   w.localStorage.removeItem(RECENT_SEEN_KEY);
+}
+
+// Daily-challenge per-day result. Key includes the YYYY-MM-DD date.
+export function getDailyResult(dateKey: string): StoredChallenge | null {
+  const w = safeWindow();
+  if (!w) return null;
+  const v = w.localStorage.getItem(DAILY_KEY_PREFIX + dateKey);
+  if (!v) return null;
+  try {
+    return JSON.parse(v) as StoredChallenge;
+  } catch {
+    return null;
+  }
+}
+
+export function saveDailyResult(dateKey: string, r: StoredChallenge) {
+  const w = safeWindow();
+  if (!w) return;
+  w.localStorage.setItem(DAILY_KEY_PREFIX + dateKey, JSON.stringify(r));
 }

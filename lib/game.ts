@@ -205,3 +205,45 @@ export function generateSeed(): string {
   const b = Math.floor(Math.random() * 36 ** 4).toString(36).padStart(4, "0");
   return `${a}${b}`;
 }
+
+// --- Daily challenge ----------------------------------------------------
+// Use the player's local date so "today" feels right wherever they are.
+// Two players in the same local day get the same lineup.
+export function todayDateKey(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function dailySeed(d: Date = new Date()): string {
+  return `daily-${todayDateKey(d)}`;
+}
+
+// --- Round-level feedback ----------------------------------------------
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const CLOSE_CALL_DAYS = 730; // ~2 years
+
+export function diffDaysVsBrady(birthDate: string): number {
+  const b = new Date(birthDate + "T00:00:00Z").getTime();
+  const brady = new Date(BRADY_BIRTH + "T00:00:00Z").getTime();
+  return Math.round(Math.abs(b - brady) / MS_PER_DAY);
+}
+
+export function closeCallMessage(birthDate: string): string | null {
+  const days = diffDaysVsBrady(birthDate);
+  if (days > CLOSE_CALL_DAYS) return null;
+  if (days < 30) return `Sneaky — only ${days} day${days === 1 ? "" : "s"} apart`;
+  if (days < 90) return `That was CLOSE — ${days} days apart`;
+  if (days < 365) {
+    const months = Math.max(1, Math.round(days / 30.44));
+    return `Sneaky close — ${months} month${months === 1 ? "" : "s"} apart`;
+  }
+  const years = (days / 365.25).toFixed(1);
+  return `Close call — ${years} years apart`;
+}
+
+export const SPEED_BONUS_MS = 3000;
+export function isSpeedBonus(elapsedMs: number, correct: boolean): boolean {
+  return correct && elapsedMs > 0 && elapsedMs < SPEED_BONUS_MS;
+}

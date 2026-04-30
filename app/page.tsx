@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { generateSeed } from "@/lib/game";
-import { getBestStreak } from "@/lib/storage";
+import { generateSeed, todayDateKey } from "@/lib/game";
+import { getBestStreak, getDailyResult } from "@/lib/storage";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
 export default function Home() {
   const [best, setBest] = useState<number | null>(null);
   const [seed, setSeed] = useState<string>("");
+  const [dailyDone, setDailyDone] = useState<{ score: number; total: number } | null>(null);
 
   useEffect(() => {
     setBest(getBestStreak());
     setSeed(generateSeed());
+    const r = getDailyResult(todayDateKey());
+    if (r) setDailyDone({ score: r.score, total: r.total });
   }, []);
 
   return (
@@ -27,6 +30,21 @@ export default function Home() {
         </p>
 
         <div className="mt-8 grid gap-3">
+          <Link
+            href="/daily"
+            className="btn-base relative block rounded-2xl py-4 text-lg font-semibold bg-amber-400 text-black hover:bg-amber-300"
+          >
+            <span>Daily Challenge</span>
+            {dailyDone ? (
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold bg-black/15 px-2 py-1 rounded-full">
+                {dailyDone.score}/{dailyDone.total} today
+              </span>
+            ) : (
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold bg-black/15 px-2 py-1 rounded-full">
+                NEW
+              </span>
+            )}
+          </Link>
           <Link
             href="/solo"
             className="btn-base block rounded-2xl py-4 text-lg font-semibold bg-white text-black hover:bg-white/90"
