@@ -2,7 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Older Than Brady?",
+  metadataBase: new URL("https://older-than-brady.vercel.app"),
+  title: {
+    default: "Older Than Brady?",
+    template: "%s · Older Than Brady?"
+  },
   description: "Is the player older or younger than Tom Brady? A quick, addictive NFL trivia game.",
   openGraph: {
     title: "Older Than Brady?",

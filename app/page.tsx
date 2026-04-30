@@ -55,8 +55,13 @@ export default function Home() {
         )}
       </div>
 
-      <footer className="mt-12 text-[11px] text-white/30">
-        Tap fast. Don&apos;t overthink it.
+      <footer className="mt-12 text-[11px] text-white/30 text-center">
+        <p>Tap fast. Don&apos;t overthink it.</p>
+        <p className="mt-2">
+          <Link href="/who-is-older-than-tom-brady" className="underline hover:text-white/60">
+            Who is older than Tom Brady? →
+          </Link>
+        </p>
       </footer>
     </div>
   );
