@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://older-than-brady.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Older Than Brady?",
     template: "%s · Older Than Brady?"
@@ -26,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <main className="min-h-screen flex flex-col">{children}</main>
+        <Analytics />
       </body>
     </html>
   );

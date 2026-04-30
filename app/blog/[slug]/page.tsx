@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { POSTS, getPost } from "@/lib/posts";
 import { ageOn } from "@/lib/game";
 import { BRADY_BIRTH } from "@/lib/players";
+import { SITE_URL } from "@/lib/site";
 
 export const revalidate = 86400;
 
@@ -56,6 +57,151 @@ function PlayCTA() {
 }
 
 // --- Article bodies -----------------------------------------------------
+
+function HowOldIsBradyBody() {
+  const bradyAge = ageOn(BRADY_BIRTH);
+  return (
+    <>
+      <p className="text-lg leading-relaxed text-white/85">
+        Tom Brady was born on <strong>August 3, 1977</strong>, in San Mateo,
+        California. As of today, that makes him <strong>{bradyAge} years old</strong>
+        . Brady retired from the NFL in February 2023 at age 45, after 23 seasons
+        — the longest NFL career ever for a quarterback.
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Career timeline by age</h2>
+      <ul className="mt-3 text-white/85 leading-relaxed list-disc pl-5 space-y-1">
+        <li><strong>Age 22</strong> (2000): Drafted 199th overall by the New England Patriots.</li>
+        <li><strong>Age 24</strong> (2001): Wins Super Bowl XXXVI as MVP after replacing an injured Drew Bledsoe.</li>
+        <li><strong>Age 29</strong> (2007): Throws 50 TD passes in a 16-0 regular season; Patriots later lose Super Bowl XLII.</li>
+        <li><strong>Age 37</strong> (2014): Wins his fourth Super Bowl over the Seahawks.</li>
+        <li><strong>Age 39</strong> (2016): The 28-3 comeback over the Falcons in Super Bowl LI — fifth ring.</li>
+        <li><strong>Age 43</strong> (2020): Leaves New England for Tampa Bay; wins his seventh Super Bowl in his first year there.</li>
+        <li><strong>Age 45</strong> (2022): Plays his final NFL season; retires February 2023.</li>
+      </ul>
+
+      <h2 className="mt-10 text-2xl font-bold">How his age compares to other QBs</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        Brady's birthdate puts him almost exactly between two generations of
+        quarterbacks. He's <strong>about 16 months younger</strong> than{" "}
+        <Link href="/older-than-brady/peyton-manning" className="underline">Peyton Manning</Link>
+        {" "}(March 24, 1976) and <strong>about 17 months older</strong> than{" "}
+        <Link href="/older-than-brady/drew-brees" className="underline">Drew Brees</Link>
+        {" "}(January 15, 1979). On the other end of the spectrum,{" "}
+        <Link href="/older-than-brady/patrick-mahomes" className="underline">Patrick Mahomes</Link>
+        {" "}(September 17, 1995) is <strong>18 years younger</strong> than Brady.
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Compared to other NFL legends</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        Brady is <strong>21 years younger</strong> than{" "}
+        <Link href="/older-than-brady/joe-montana" className="underline">Joe Montana</Link>
+        {" "}(June 11, 1956), <strong>16 years younger</strong> than{" "}
+        <Link href="/older-than-brady/dan-marino" className="underline">Dan Marino</Link>
+        {" "}(September 15, 1961), and almost <strong>8 years younger</strong> than{" "}
+        <Link href="/older-than-brady/brett-favre" className="underline">Brett Favre</Link>
+        {" "}(October 10, 1969). On the other side,{" "}
+        <Link href="/older-than-brady/aaron-rodgers" className="underline">Aaron Rodgers</Link>
+        {" "}is about 6 years younger than Brady (December 2, 1983).
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Outside football</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        Across sports, Brady is famously close in age to{" "}
+        <Link href="/older-than-brady/kobe-bryant" className="underline">Kobe Bryant</Link>
+        {" "}(20 days younger) and{" "}
+        <Link href="/older-than-brady/roger-federer" className="underline">Roger Federer</Link>
+        {" "}(four years and five days younger). He's almost exactly{" "}
+        <Link href="/older-than-brady/lebron-james" className="underline">7 years older than LeBron James</Link>
+        , who was born December 30, 1984.
+      </p>
+
+      <PlayCTA />
+
+      <p className="text-sm text-white/50">
+        See the{" "}
+        <Link href="/who-is-older-than-tom-brady" className="underline">
+          full athlete-vs-Brady comparison list
+        </Link>
+        {" "}or pick any name on the{" "}
+        <Link href="/" className="underline">game</Link>
+        {" "}and see if you can guess older or younger.
+      </p>
+    </>
+  );
+}
+
+function BradyVsLeBronBody() {
+  const bradyAge = ageOn(BRADY_BIRTH);
+  const lebronAge = ageOn("1984-12-30");
+  return (
+    <>
+      <p className="text-lg leading-relaxed text-white/85">
+        Two of the most argued-about athletes of the 21st century, Tom Brady and
+        LeBron James, are often discussed in the same GOAT-of-their-sport
+        sentences. But how close in age are they actually?
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">The short answer</h2>
+      <p className="mt-3 text-2xl">
+        <strong className="text-emerald-300">Tom Brady is older.</strong>
+      </p>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        Brady was born <strong>August 3, 1977</strong>. LeBron was born{" "}
+        <strong>December 30, 1984</strong>. That's a gap of almost exactly{" "}
+        <strong>7 years and 5 months</strong>. Today, Brady is <strong>{bradyAge}</strong>{" "}
+        years old; LeBron is <strong>{lebronAge}</strong>.
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Career overlap</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        When Brady was drafted in 2000, LeBron was 15 years old and still in
+        high school. By the time LeBron entered the NBA in 2003, Brady had
+        already won his second Super Bowl. That gap — Brady having a half-decade
+        head start — is part of why their careers feel like they belong to
+        slightly different eras even though they overlapped for two full
+        decades.
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">Generational placement</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        Brady's contemporaries are quarterbacks like{" "}
+        <Link href="/older-than-brady/peyton-manning" className="underline">
+          Peyton Manning
+        </Link>
+        ,{" "}
+        <Link href="/older-than-brady/drew-brees" className="underline">Drew Brees</Link>
+        , and{" "}
+        <Link href="/older-than-brady/eli-manning" className="underline">Eli Manning</Link>
+        {" "}— and basketball stars like{" "}
+        <Link href="/older-than-brady/kobe-bryant" className="underline">Kobe Bryant</Link>
+        , and{" "}
+        <Link href="/older-than-brady/tim-duncan" className="underline">Tim Duncan</Link>
+        . LeBron's generation includes{" "}
+        <Link href="/older-than-brady/dwyane-wade" className="underline">Dwyane Wade</Link>
+        {" "}(1982) and Carmelo Anthony (1984) — both closer to LeBron's age than to
+        Brady's.
+      </p>
+
+      <h2 className="mt-10 text-2xl font-bold">A fun coincidence</h2>
+      <p className="mt-3 text-white/85 leading-relaxed">
+        LeBron is famously close in age to Patrick Mahomes — they're 11 years
+        apart. Mahomes is closer in age to LeBron's son Bronny than to Tom
+        Brady. That's the size of the Brady-LeBron gap.
+      </p>
+
+      <PlayCTA />
+
+      <p className="text-sm text-white/50">
+        For more cross-sport comparisons see{" "}
+        <Link href="/who-is-older-than-tom-brady" className="underline">
+          Who Is Older Than Tom Brady?
+        </Link>
+        {" "}— 30+ athletes ranked by birthdate.
+      </p>
+    </>
+  );
+}
 
 function ClosestFiveBody() {
   return (
@@ -222,6 +368,8 @@ function GenerationBody() {
 }
 
 const BODY: Record<string, () => React.ReactElement> = {
+  "how-old-is-tom-brady": HowOldIsBradyBody,
+  "tom-brady-vs-lebron-james-whos-older": BradyVsLeBronBody,
   "5-athletes-born-within-days-of-tom-brady": ClosestFiveBody,
   "bradys-generation-nfl-quarterbacks-of-the-70s": GenerationBody
 };
@@ -244,7 +392,7 @@ export default async function PostPage({
     datePublished: post.date,
     dateModified: post.date,
     author: { "@type": "Organization", name: "Older Than Brady?" },
-    mainEntityOfPage: `https://older-than-brady.vercel.app/blog/${post.slug}`
+    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`
   };
 
   return (

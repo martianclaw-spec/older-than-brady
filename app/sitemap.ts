@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { FEATURED_ATHLETES } from "@/lib/featured";
 import { POSTS } from "@/lib/posts";
-
-const BASE = "https://older-than-brady.vercel.app";
+import { SITE_URL as BASE } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

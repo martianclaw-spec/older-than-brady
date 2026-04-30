@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ageDiffLabel, ageOn, diffDaysVsBrady, isOlderThanBrady } from "@/lib/game";
 import { BRADY_BIRTH, BRADY_NAME, PLAYERS } from "@/lib/players";
 import { FEATURED_ATHLETES, findFeatured } from "@/lib/featured";
+import { SITE_URL } from "@/lib/site";
 
 export const revalidate = 86400;
 
@@ -133,9 +134,9 @@ export default async function PlayerPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Older Than Brady?", item: "https://older-than-brady.vercel.app/" },
-      { "@type": "ListItem", position: 2, name: "Who Is Older Than Tom Brady?", item: "https://older-than-brady.vercel.app/who-is-older-than-tom-brady" },
-      { "@type": "ListItem", position: 3, name: `Is ${r.name} Older Than Tom Brady?`, item: `https://older-than-brady.vercel.app/older-than-brady/${r.slug}` }
+      { "@type": "ListItem", position: 1, name: "Older Than Brady?", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Who Is Older Than Tom Brady?", item: `${SITE_URL}/who-is-older-than-tom-brady` },
+      { "@type": "ListItem", position: 3, name: `Is ${r.name} Older Than Tom Brady?`, item: `${SITE_URL}/older-than-brady/${r.slug}` }
     ]
   };
 
