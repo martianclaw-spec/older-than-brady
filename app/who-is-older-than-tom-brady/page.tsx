@@ -129,7 +129,9 @@ export default function Page() {
     <article className="max-w-3xl mx-auto px-5 py-10">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqLd).replace(/</g, "\\u003c")
+        }}
       />
 
       <nav className="mb-6 text-sm">
