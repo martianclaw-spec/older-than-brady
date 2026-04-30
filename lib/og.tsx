@@ -12,11 +12,14 @@ type OGProps = {
 
 const ACCENTS = {
   white: "#ffffff",
-  red: "#ff4d4d",
+  red: "#ff5b5b",
   amber: "#fbbf24",
   emerald: "#34d399"
 } as const;
 
+// Solid colors only — Satori is picky about gradients in the edge runtime,
+// and custom fonts require an explicit fetch (omitted for reliability and
+// faster first-paint; system fallback is fine for short, large headlines).
 export function renderOG(props: OGProps) {
   const accent = ACCENTS[props.accent ?? "white"];
   return new ImageResponse(
@@ -29,55 +32,55 @@ export function renderOG(props: OGProps) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px",
-          background:
-            "radial-gradient(circle at 80% 110%, #013369 0%, #07080b 55%), #07080b",
-          color: "#f5f7fb",
-          fontFamily: "system-ui, sans-serif"
+          backgroundColor: "#013369",
+          color: "#f5f7fb"
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <div
             style={{
               width: "16px",
               height: "16px",
               borderRadius: "9999px",
-              background: "#D50A0A"
+              backgroundColor: "#D50A0A",
+              marginRight: "16px"
             }}
           />
           <div
             style={{
               fontSize: "26px",
               fontWeight: 700,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.7)"
+              letterSpacing: "4px",
+              color: "rgba(255,255,255,0.75)",
+              display: "flex"
             }}
           >
-            Older Than Brady?
+            OLDER THAN BRADY?
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           {props.eyebrow ? (
             <div
               style={{
                 fontSize: "26px",
                 fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.55)"
+                letterSpacing: "3px",
+                color: "rgba(255,255,255,0.6)",
+                marginBottom: "20px",
+                display: "flex"
               }}
             >
-              {props.eyebrow}
+              {props.eyebrow.toUpperCase()}
             </div>
           ) : null}
           <div
             style={{
-              fontSize: props.title.length > 38 ? "76px" : "92px",
+              fontSize: props.title.length > 40 ? "72px" : "92px",
               fontWeight: 900,
               lineHeight: 1.05,
-              letterSpacing: "-0.02em",
-              color: accent
+              color: accent,
+              display: "flex"
             }}
           >
             {props.title}
@@ -85,10 +88,12 @@ export function renderOG(props: OGProps) {
           {props.subtitle ? (
             <div
               style={{
-                fontSize: "32px",
+                fontSize: "30px",
                 lineHeight: 1.3,
                 color: "rgba(255,255,255,0.78)",
-                maxWidth: "950px"
+                maxWidth: "950px",
+                marginTop: "24px",
+                display: "flex"
               }}
             >
               {props.subtitle}
@@ -102,11 +107,17 @@ export function renderOG(props: OGProps) {
             justifyContent: "space-between",
             alignItems: "flex-end",
             color: "rgba(255,255,255,0.55)",
-            fontSize: "24px"
+            fontSize: "22px"
           }}
         >
-          <div>older-than-brady.vercel.app</div>
-          <div style={{ fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>
+          <div style={{ display: "flex" }}>older-than-brady.vercel.app</div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.85)",
+              display: "flex"
+            }}
+          >
             Tap. Guess. Win.
           </div>
         </div>
