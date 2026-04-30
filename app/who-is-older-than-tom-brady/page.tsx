@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ageDiffLabel, ageOn, isOlderThanBrady } from "@/lib/game";
 import { BRADY_BIRTH, BRADY_NAME, PLAYERS } from "@/lib/players";
+import { FEATURED_ATHLETES } from "@/lib/featured";
 
 export const revalidate = 86400;
 
@@ -19,43 +20,10 @@ export const metadata: Metadata = {
   }
 };
 
-const FEATURED: string[] = [
-  // NFL
-  "Peyton Manning",
-  "Aaron Rodgers",
-  "Drew Brees",
-  "Patrick Mahomes",
-  "Eli Manning",
-  "Ben Roethlisberger",
-  "Joe Montana",
-  "Brett Favre",
-  "Tony Romo",
-  "Michael Vick",
-  "Randy Moss",
-  "Marvin Harrison",
-  "Jerry Rice",
-  "Dan Marino",
-  "Ray Lewis",
-  "Adrian Peterson",
-  "Calvin Johnson",
-  "Lamar Jackson",
-  "Joe Burrow",
-  // NBA
-  "LeBron James",
-  "Kobe Bryant",
-  "Shaquille O'Neal",
-  "Tim Duncan",
-  "Allen Iverson",
-  // MLB
-  "Derek Jeter",
-  "Alex Rodriguez",
-  // Golf
-  "Tiger Woods",
-  "Phil Mickelson",
-  // Tennis
-  "Roger Federer",
-  "Serena Williams"
-];
+const FEATURED: string[] = FEATURED_ATHLETES.map((a) => a.name);
+const SLUG_BY_NAME: Record<string, string> = Object.fromEntries(
+  FEATURED_ATHLETES.map((a) => [a.name, a.slug])
+);
 
 function formatBirthDate(d: string): string {
   // d is YYYY-MM-DD; render as "Month Day, Year" without timezone drift.
@@ -133,6 +101,15 @@ export default function Page() {
           __html: JSON.stringify(faqLd).replace(/</g, "\\u003c")
         }}
       />
+      <p className="sr-only">
+        Quick links:{" "}
+        {featured.slice(0, 5).map((p, i) => (
+          <span key={p.name}>
+            <Link href={`/older-than-brady/${SLUG_BY_NAME[p.name]}`}>{p.name}</Link>
+            {i < 4 ? ", " : ""}
+          </span>
+        ))}
+      </p>
 
       <nav className="mb-6 text-sm">
         <Link href="/" className="text-white/60 hover:text-white">
@@ -171,21 +148,35 @@ export default function Page() {
       <hr className="my-10 border-white/10" />
 
       <div className="space-y-6">
-        {featured.map((p) => (
-          <section key={p.name} id={p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
-            <h2 className="text-xl sm:text-2xl font-bold">
-              Is {p.name} older than Tom Brady?
-            </h2>
-            <p className="mt-2 text-white/85 leading-relaxed">
-              <strong className={p.older ? "text-emerald-300" : "text-rose-300"}>
-                {p.older ? "Yes" : "No"}.
-              </strong>{" "}
-              {p.name} was born on <strong>{p.birthDatePretty}</strong>, which makes them{" "}
-              {p.diff} {p.older ? "older" : "younger"} than Tom Brady. {p.name} is{" "}
-              {p.age} years old; Brady is {bradyAge}.
-            </p>
-          </section>
-        ))}
+        {featured.map((p) => {
+          const slug = SLUG_BY_NAME[p.name];
+          return (
+            <section key={p.name} id={slug}>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                <Link
+                  href={`/older-than-brady/${slug}`}
+                  className="hover:underline"
+                >
+                  Is {p.name} older than Tom Brady?
+                </Link>
+              </h2>
+              <p className="mt-2 text-white/85 leading-relaxed">
+                <strong className={p.older ? "text-emerald-300" : "text-rose-300"}>
+                  {p.older ? "Yes" : "No"}.
+                </strong>{" "}
+                {p.name} was born on <strong>{p.birthDatePretty}</strong>, which makes them{" "}
+                {p.diff} {p.older ? "older" : "younger"} than Tom Brady. {p.name} is{" "}
+                {p.age} years old; Brady is {bradyAge}.{" "}
+                <Link
+                  href={`/older-than-brady/${slug}`}
+                  className="text-white/60 hover:text-white underline"
+                >
+                  Read more →
+                </Link>
+              </p>
+            </section>
+          );
+        })}
       </div>
 
       <hr className="my-10 border-white/10" />
