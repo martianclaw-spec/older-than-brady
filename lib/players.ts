@@ -1,8 +1,11 @@
 import raw from "@/data/players.json";
 
+export type Category = "nfl" | "nba" | "mlb" | "golf" | "tennis" | "celebrity";
+
 export type Player = {
   name: string;
   birthDate: string;
+  category: Category;
   imageUrl: string;
 };
 
@@ -13,9 +16,14 @@ export function imageUrlFor(name: string): string {
   return `https://ui-avatars.com/api/?name=${q}&size=400&background=${NFL_NAVY}&color=ffffff&bold=true&format=svg`;
 }
 
-export const PLAYERS: Player[] = (raw as { name: string; birthDate: string }[]).map(
-  (p) => ({ ...p, imageUrl: imageUrlFor(p.name) })
-);
+type RawPlayer = { name: string; birthDate: string; category?: Category };
+
+export const PLAYERS: Player[] = (raw as RawPlayer[]).map((p) => ({
+  name: p.name,
+  birthDate: p.birthDate,
+  category: p.category ?? "nfl",
+  imageUrl: imageUrlFor(p.name)
+}));
 
 export const BRADY_BIRTH = "1977-08-03";
 export const BRADY_NAME = "Tom Brady";
