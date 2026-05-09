@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ageDiffLabel, ageOn, diffDaysVsBrady, isOlderThanBrady } from "@/lib/game";
 import { BRADY_BIRTH, BRADY_NAME, PLAYERS } from "@/lib/players";
-import { FEATURED_ATHLETES, findFeatured } from "@/lib/featured";
+import { allAthleteSlugs, FEATURED_ATHLETES, resolveAthlete } from "@/lib/featured";
 import { SITE_URL } from "@/lib/site";
 import GuessFirstHero from "@/components/GuessFirstHero";
 import StickyPlayBar from "@/components/StickyPlayBar";
@@ -11,7 +11,7 @@ import StickyPlayBar from "@/components/StickyPlayBar";
 export const revalidate = 86400;
 
 export function generateStaticParams() {
-  return FEATURED_ATHLETES.map((a) => ({ slug: a.slug }));
+  return allAthleteSlugs();
 }
 
 function formatBirthDate(d: string): string {
@@ -36,15 +36,15 @@ type Resolved = {
 };
 
 function resolve(slug: string): Resolved | null {
-  const featured = findFeatured(slug);
-  if (!featured) return null;
-  const p = PLAYERS.find((x) => x.name === featured.name);
+  const athlete = resolveAthlete(slug);
+  if (!athlete) return null;
+  const p = PLAYERS.find((x) => x.name === athlete.name);
   if (!p) return null;
   return {
-    slug: featured.slug,
-    name: featured.name,
-    tagline: featured.tagline,
-    sport: featured.sport,
+    slug: athlete.slug,
+    name: athlete.name,
+    tagline: athlete.tagline,
+    sport: athlete.sport,
     birthDate: p.birthDate,
     birthDatePretty: formatBirthDate(p.birthDate),
     age: ageOn(p.birthDate),
@@ -63,9 +63,10 @@ export async function generateMetadata({
   if (!r) return { title: "Not found" };
   const verb = r.older ? "older" : "younger";
   const inverse = r.older ? "younger" : "older";
+  const taglineSuffix = r.tagline ? ` ${r.tagline}.` : "";
   return {
     title: `Is ${r.name} Older or Younger Than Tom Brady?`,
-    description: `${r.name} was born ${r.birthDatePretty}, making them ${r.diff} ${verb} than Tom Brady — not ${inverse}. ${r.tagline}.`,
+    description: `${r.name} was born ${r.birthDatePretty}, making them ${r.diff} ${verb} than Tom Brady — not ${inverse}.${taglineSuffix}`,
     alternates: { canonical: `/older-than-brady/${r.slug}` },
     openGraph: {
       title: `Is ${r.name} Older or Younger Than Tom Brady?`,
@@ -198,8 +199,8 @@ export default async function PlayerPage({
 
       <p className="mt-4 text-white/70 leading-relaxed">
         {r.name} was born on <strong>{r.birthDatePretty}</strong>, while Brady was born
-        on <strong>{bradyBornPretty}</strong>. {r.tagline}. Today, {r.name} is{" "}
-        <strong>{r.age} years old</strong> and Brady is <strong>{bradyAge}</strong>.
+        on <strong>{bradyBornPretty}</strong>.{r.tagline ? ` ${r.tagline}.` : ""} Today,{" "}
+        {r.name} is <strong>{r.age} years old</strong> and Brady is <strong>{bradyAge}</strong>.
       </p>
 
       <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">

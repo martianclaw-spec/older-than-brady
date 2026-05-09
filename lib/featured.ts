@@ -2,13 +2,24 @@
 // pages. Names match entries in data/players.json so birthdates resolve
 // automatically. Taglines are short, factual, and used in <meta description>
 // + page intro.
-export type Sport = "NFL" | "NBA" | "MLB" | "Golf" | "Tennis";
+import { Category, PLAYERS } from "./players";
+
+export type Sport = "NFL" | "NBA" | "MLB" | "Golf" | "Tennis" | "Celebrity";
 
 export type FeaturedAthlete = {
   name: string;
   slug: string;
   tagline: string;
   sport: Sport;
+};
+
+const CATEGORY_TO_SPORT: Record<Category, Sport> = {
+  nfl: "NFL",
+  nba: "NBA",
+  mlb: "MLB",
+  golf: "Golf",
+  tennis: "Tennis",
+  celebrity: "Celebrity"
 };
 
 export function slugify(name: string): string {
@@ -93,4 +104,26 @@ export const FEATURED_ATHLETES: FeaturedAthlete[] = [
 
 export function findFeatured(slug: string): FeaturedAthlete | undefined {
   return FEATURED_ATHLETES.find((a) => a.slug === slug);
+}
+
+// resolveAthlete: featured-first, then fallback to ANY player in players.json.
+// Non-featured players get an empty tagline (the page template handles that).
+// This is what makes /older-than-brady/drew-bledsoe and friends resolve even
+// though they aren't in the curated list above.
+export function resolveAthlete(slug: string): FeaturedAthlete | null {
+  const featured = findFeatured(slug);
+  if (featured) return featured;
+  const player = PLAYERS.find((p) => slugify(p.name) === slug);
+  if (!player) return null;
+  return {
+    name: player.name,
+    slug,
+    tagline: "",
+    sport: CATEGORY_TO_SPORT[player.category]
+  };
+}
+
+// All slugs we want to statically generate pages for: every player in the dataset.
+export function allAthleteSlugs(): { slug: string }[] {
+  return PLAYERS.map((p) => ({ slug: slugify(p.name) }));
 }

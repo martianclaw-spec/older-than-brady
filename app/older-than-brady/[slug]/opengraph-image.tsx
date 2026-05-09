@@ -1,5 +1,5 @@
 import { ageDiffLabel, isOlderThanBrady } from "@/lib/game";
-import { findFeatured } from "@/lib/featured";
+import { resolveAthlete } from "@/lib/featured";
 import { PLAYERS } from "@/lib/players";
 import { OG_CONTENT_TYPE, OG_SIZE, renderOG } from "@/lib/og";
 
@@ -9,9 +9,9 @@ export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
 export default async function OG({ params }: { params: { slug: string } }) {
-  const f = findFeatured(params.slug);
-  const p = f ? PLAYERS.find((x) => x.name === f.name) : null;
-  if (!f || !p) {
+  const a = resolveAthlete(params.slug);
+  const p = a ? PLAYERS.find((x) => x.name === a.name) : null;
+  if (!a || !p) {
     return renderOG({
       eyebrow: "Comparison",
       title: "Older Than Brady?",
@@ -23,9 +23,9 @@ export default async function OG({ params }: { params: { slug: string } }) {
   const verb = older ? "OLDER" : "YOUNGER";
   const diff = ageDiffLabel(p.birthDate);
   return renderOG({
-    eyebrow: `Is ${f.name} older than Tom Brady?`,
+    eyebrow: `Is ${a.name} older than Tom Brady?`,
     title: `${older ? "Yes" : "No"} — ${verb} by ${diff}`,
-    subtitle: f.tagline,
+    subtitle: a.tagline || `Born ${p.birthDate}`,
     accent: older ? "emerald" : "red"
   });
 }

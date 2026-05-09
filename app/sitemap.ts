@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { FEATURED_ATHLETES } from "@/lib/featured";
+import { allAthleteSlugs, FEATURED_ATHLETES } from "@/lib/featured";
 import { POSTS } from "@/lib/posts";
 import { SITE_URL as BASE } from "@/lib/site";
 
@@ -20,11 +20,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/daily`, lastModified: now, changeFrequency: "daily", priority: 0.6 }
   ];
 
-  const players: MetadataRoute.Sitemap = FEATURED_ATHLETES.map((a) => ({
-    url: `${BASE}/older-than-brady/${a.slug}`,
+  // Featured athletes get higher priority (curated, hand-written taglines).
+  // Every other player in the dataset still gets indexed at lower priority —
+  // ensures search queries like "is drew bledsoe older than tom brady" land
+  // somewhere on this site.
+  const featuredSlugs = new Set(FEATURED_ATHLETES.map((a) => a.slug));
+  const players: MetadataRoute.Sitemap = allAthleteSlugs().map(({ slug }) => ({
+    url: `${BASE}/older-than-brady/${slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: 0.8
+    priority: featuredSlugs.has(slug) ? 0.8 : 0.6
   }));
 
   const articles: MetadataRoute.Sitemap = POSTS.map((p) => ({
