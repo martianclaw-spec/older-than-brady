@@ -62,12 +62,13 @@ export async function generateMetadata({
   const r = resolve(slug);
   if (!r) return { title: "Not found" };
   const verb = r.older ? "older" : "younger";
+  const inverse = r.older ? "younger" : "older";
   return {
-    title: `Is ${r.name} Older Than Tom Brady?`,
-    description: `${r.name} was born ${r.birthDatePretty}, making them ${r.diff} ${verb} than Tom Brady. ${r.tagline}.`,
+    title: `Is ${r.name} Older or Younger Than Tom Brady?`,
+    description: `${r.name} was born ${r.birthDatePretty}, making them ${r.diff} ${verb} than Tom Brady — not ${inverse}. ${r.tagline}.`,
     alternates: { canonical: `/older-than-brady/${r.slug}` },
     openGraph: {
-      title: `Is ${r.name} Older Than Tom Brady?`,
+      title: `Is ${r.name} Older or Younger Than Tom Brady?`,
       description: `${r.name} is ${r.diff} ${verb} than Tom Brady.`,
       type: "article",
       url: `/older-than-brady/${r.slug}`
@@ -117,6 +118,8 @@ export default async function PlayerPage({
   const yesNo = r.older ? "Yes" : "No";
   const related = relatedAthletes(slug);
 
+  const inverseVerb = r.older ? "younger" : "older";
+  const inverseYesNo = r.older ? "No" : "Yes"; // mirror answer
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -128,6 +131,14 @@ export default async function PlayerPage({
           "@type": "Answer",
           text: `${yesNo}. ${r.name} was born ${r.birthDatePretty}, ${r.diff} ${verb} than Tom Brady (born ${bradyBornPretty}).`
         }
+      },
+      {
+        "@type": "Question",
+        name: `Is ${r.name} younger than Tom Brady?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `${inverseYesNo}. ${r.name} is ${r.diff} ${verb} than Brady — not ${inverseVerb}. ${r.name} was born ${r.birthDatePretty}; Brady was born ${bradyBornPretty}.`
+        }
       }
     ]
   };
@@ -138,7 +149,7 @@ export default async function PlayerPage({
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Older Than Brady?", item: `${SITE_URL}/` },
       { "@type": "ListItem", position: 2, name: "Who Is Older Than Tom Brady?", item: `${SITE_URL}/who-is-older-than-tom-brady` },
-      { "@type": "ListItem", position: 3, name: `Is ${r.name} Older Than Tom Brady?`, item: `${SITE_URL}/older-than-brady/${r.slug}` }
+      { "@type": "ListItem", position: 3, name: `Is ${r.name} Older or Younger Than Tom Brady?`, item: `${SITE_URL}/older-than-brady/${r.slug}` }
     ]
   };
 
@@ -168,7 +179,7 @@ export default async function PlayerPage({
       </nav>
 
       <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-8">
-        Is {r.name} Older Than Tom Brady?
+        Is {r.name} Older or Younger Than Tom Brady?
       </h1>
 
       <GuessFirstHero
@@ -190,6 +201,16 @@ export default async function PlayerPage({
         on <strong>{bradyBornPretty}</strong>. {r.tagline}. Today, {r.name} is{" "}
         <strong>{r.age} years old</strong> and Brady is <strong>{bradyAge}</strong>.
       </p>
+
+      <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
+        <p>
+          <strong>Is {r.name} younger than Tom Brady?</strong>{" "}
+          <span className={r.older ? "text-rose-300 font-semibold" : "text-emerald-300 font-semibold"}>
+            {r.older ? "No" : "Yes"}
+          </span>{" "}
+          — {r.name} is {r.diff} {verb} than Brady, the opposite direction.
+        </p>
+      </div>
 
       <div className="mt-8">
         <PlayCTA />

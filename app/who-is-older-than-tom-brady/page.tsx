@@ -9,14 +9,14 @@ import StickyPlayBar from "@/components/StickyPlayBar";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Who Is Older Than Tom Brady? Birthdates of 30 Famous Athletes",
+  title: "Who Is Older or Younger Than Tom Brady? Birthdates of 30+ Athletes",
   description:
-    "See which famous athletes were born before or after Tom Brady (August 3, 1977). Quick yes/no answers for Peyton Manning, LeBron James, Tiger Woods, and 25+ more.",
+    "See which famous athletes were born before or after Tom Brady (August 3, 1977). Quick yes/no answers — older or younger — for Peyton Manning, LeBron James, Tiger Woods, and 25+ more.",
   alternates: { canonical: "/who-is-older-than-tom-brady" },
   openGraph: {
-    title: "Who Is Older Than Tom Brady?",
+    title: "Who Is Older or Younger Than Tom Brady?",
     description:
-      "Quick birthdate comparisons for 30 famous athletes vs. Tom Brady (born August 3, 1977).",
+      "Birthdate comparisons for 30+ famous athletes vs. Tom Brady. Older or younger? See instantly.",
     type: "article",
     url: "/who-is-older-than-tom-brady"
   }
@@ -120,7 +120,7 @@ export default function Page() {
       </nav>
 
       <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-        Who Is Older Than Tom Brady?
+        Who Is Older or Younger Than Tom Brady?
       </h1>
       <p className="mt-3 mb-8 text-white/60 text-sm">
         Last updated: {formatBirthDate(new Date().toISOString().slice(0, 10))}
@@ -148,6 +148,12 @@ export default function Page() {
           play the full game
         </Link>{" "}
         to test your instincts on 100+ more.
+      </p>
+
+      <p className="mt-3 text-sm text-white/50">
+        Whether you're searching <em>&ldquo;is X older than Tom Brady&rdquo;</em> or{" "}
+        <em>&ldquo;is X younger than Tom Brady&rdquo;</em>, the same comparison answers both —
+        every athlete below is either born before August 3, 1977 (older) or after (younger).
       </p>
 
       <hr className="my-10 border-white/10" />
