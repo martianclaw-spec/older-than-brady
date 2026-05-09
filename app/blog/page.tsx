@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { POSTS } from "@/lib/posts";
+import StickyPlayBar from "@/components/StickyPlayBar";
 
 export const metadata: Metadata = {
   title: "Blog · Older Than Brady?",
@@ -70,6 +71,7 @@ export default function BlogIndex() {
           Play the game →
         </Link>
       </div>
+      <StickyPlayBar />
     </article>
   );
 }

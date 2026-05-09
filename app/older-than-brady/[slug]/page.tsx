@@ -5,6 +5,8 @@ import { ageDiffLabel, ageOn, diffDaysVsBrady, isOlderThanBrady } from "@/lib/ga
 import { BRADY_BIRTH, BRADY_NAME, PLAYERS } from "@/lib/players";
 import { FEATURED_ATHLETES, findFeatured } from "@/lib/featured";
 import { SITE_URL } from "@/lib/site";
+import GuessFirstHero from "@/components/GuessFirstHero";
+import StickyPlayBar from "@/components/StickyPlayBar";
 
 export const revalidate = 86400;
 
@@ -165,9 +167,14 @@ export default async function PlayerPage({
         <span className="text-white/80">{r.name}</span>
       </nav>
 
-      <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
+      <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-8">
         Is {r.name} Older Than Tom Brady?
       </h1>
+
+      <GuessFirstHero
+        title="Don't peek — guess first."
+        subtitle={`We'll tell you below. But the answer is one of dozens in the 10-round quiz — try yourself before reading the spoiler.`}
+      />
 
       <p className="mt-6 text-2xl leading-snug">
         <strong className={r.older ? "text-emerald-300" : "text-rose-300"}>
@@ -245,6 +252,7 @@ export default async function PlayerPage({
           .
         </p>
       </footer>
+      <StickyPlayBar />
     </article>
   );
 }

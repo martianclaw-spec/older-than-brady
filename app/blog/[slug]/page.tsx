@@ -5,6 +5,7 @@ import { POSTS, getPost } from "@/lib/posts";
 import { ageOn } from "@/lib/game";
 import { BRADY_BIRTH } from "@/lib/players";
 import { SITE_URL } from "@/lib/site";
+import StickyPlayBar from "@/components/StickyPlayBar";
 
 export const revalidate = 86400;
 
@@ -434,6 +435,7 @@ export default async function PostPage({
           ))}
         </p>
       </footer>
+      <StickyPlayBar />
     </article>
   );
 }

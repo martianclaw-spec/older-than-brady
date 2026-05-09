@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ageDiffLabel, ageOn, isOlderThanBrady } from "@/lib/game";
 import { BRADY_BIRTH, BRADY_NAME, PLAYERS } from "@/lib/players";
 import { FEATURED_ATHLETES } from "@/lib/featured";
+import GuessFirstHero from "@/components/GuessFirstHero";
+import StickyPlayBar from "@/components/StickyPlayBar";
 
 export const revalidate = 86400;
 
@@ -120,11 +122,14 @@ export default function Page() {
       <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
         Who Is Older Than Tom Brady?
       </h1>
-      <p className="mt-3 text-white/60 text-sm">
+      <p className="mt-3 mb-8 text-white/60 text-sm">
         Last updated: {formatBirthDate(new Date().toISOString().slice(0, 10))}
       </p>
 
-      <PlayCTA />
+      <GuessFirstHero
+        title={`${featured.length} athletes vs Tom Brady — but try guessing first.`}
+        subtitle="The cheat sheet is below if you give up. But it's way more fun if you take the 10-round quiz first."
+      />
 
       <p className="text-lg leading-relaxed text-white/85">
         Tom Brady was born on <strong>{bradyBornPretty}</strong>, which makes him{" "}
@@ -203,6 +208,7 @@ export default function Page() {
           guessing game.
         </p>
       </footer>
+      <StickyPlayBar />
     </article>
   );
 }
