@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 import BradyHeader from "@/components/BradyHeader";
 import PlayerCard from "@/components/PlayerCard";
 import ChoiceButtons from "@/components/ChoiceButtons";
@@ -147,6 +148,7 @@ export default function DailyPage() {
   const [roundElapsed, setRoundElapsed] = useState<number | null>(null);
   const startRef = useRef<number | null>(null);
   const roundStartRef = useRef<number | null>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     const today = todayDateKey();
@@ -165,6 +167,10 @@ export default function DailyPage() {
 
   const handle = (c: Choice) => {
     if (!current || phase !== "answering") return;
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      track("game_start", { mode: "daily" });
+    }
     const elapsed = roundStartRef.current ? Date.now() - roundStartRef.current : 0;
     setRoundElapsed(elapsed);
     setChosen(c);
@@ -186,6 +192,7 @@ export default function DailyPage() {
       };
       saveDailyResult(dateKey, result);
       setSavedResult(result);
+      track("game_finish", { mode: "daily", score });
       return;
     }
     setIndex(next);

@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { track } from "@vercel/analytics";
 import BradyHeader from "@/components/BradyHeader";
 import PlayerCard from "@/components/PlayerCard";
 import ChoiceButtons from "@/components/ChoiceButtons";
@@ -33,6 +34,7 @@ function ChallengeInner() {
   const [roundElapsed, setRoundElapsed] = useState<number | null>(null);
   const startRef = useRef<number | null>(null);
   const roundStartRef = useRef<number | null>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     if (!seedFromUrl) {
@@ -50,6 +52,10 @@ function ChallengeInner() {
 
   const handle = (c: Choice) => {
     if (!current || phase !== "answering") return;
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      track("game_start", { mode: "challenge" });
+    }
     const elapsed = roundStartRef.current ? Date.now() - roundStartRef.current : 0;
     setRoundElapsed(elapsed);
     setChosen(c);
@@ -69,6 +75,7 @@ function ChallengeInner() {
         timeMs: elapsed,
         completedAt: Date.now()
       });
+      track("game_finish", { mode: "challenge", score });
       router.push(`/results?seed=${seed}&score=${score}&time=${elapsed}`);
       return;
     }

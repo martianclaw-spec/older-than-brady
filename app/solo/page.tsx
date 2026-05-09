@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 import BradyHeader from "@/components/BradyHeader";
 import PlayerCard from "@/components/PlayerCard";
 import ChoiceButtons from "@/components/ChoiceButtons";
@@ -33,6 +34,7 @@ export default function SoloPage() {
   const [roundElapsed, setRoundElapsed] = useState<number | null>(null);
   const [losingPlayer, setLosingPlayer] = useState<Player | null>(null);
   const roundStartRef = useRef<number | null>(null);
+  const hasStartedRef = useRef(false);
 
   const startRun = () => {
     const initial = avoidImmediateRepeat(
@@ -47,6 +49,7 @@ export default function SoloPage() {
     setRoundElapsed(null);
     setLosingPlayer(null);
     roundStartRef.current = Date.now();
+    hasStartedRef.current = false;
   };
 
   useEffect(() => {
@@ -66,6 +69,10 @@ export default function SoloPage() {
     const correct = c === correctAnswer(current.birthDate);
     setLastSoloPlayer(current.name);
     pushRecentSeen(current.name);
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      track("game_start", { mode: "solo" });
+    }
     if (correct) {
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -75,6 +82,7 @@ export default function SoloPage() {
       }
     } else {
       setLosingPlayer(current);
+      track("game_end", { mode: "solo", streak });
     }
   };
 
