@@ -206,6 +206,28 @@ export function generateSeed(): string {
   return `${a}${b}`;
 }
 
+// --- Shareable Wordle-style emoji result -------------------------------
+// 🟩 = correct, 🟥 = wrong. Designed to be copy-pasteable into iMessage /
+// Twitter / Slack so the recipient sees the result before any link.
+export function emojiResultLine(rounds: boolean[]): string {
+  return rounds.map((r) => (r ? "🟩" : "🟥")).join("");
+}
+
+export function formatShortDate(d: Date = new Date()): string {
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  return `${months[d.getMonth()]} ${d.getDate()}`;
+}
+
+export function formatElapsedShort(ms: number): string {
+  const totalSec = Math.round(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m === 0 ? `${s}s` : `${m}m${s.toString().padStart(2, "0")}s`;
+}
+
 // --- Daily challenge ----------------------------------------------------
 // Use the player's local date so "today" feels right wherever they are.
 // Two players in the same local day get the same lineup.

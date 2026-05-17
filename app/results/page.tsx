@@ -4,8 +4,13 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import BradyHeader from "@/components/BradyHeader";
-import { CHALLENGE_ROUNDS, generateSeed } from "@/lib/game";
-import { getBestStreak } from "@/lib/storage";
+import {
+  CHALLENGE_ROUNDS,
+  emojiResultLine,
+  formatElapsedShort,
+  generateSeed
+} from "@/lib/game";
+import { getBestStreak, getChallengeResult } from "@/lib/storage";
 
 function formatTime(ms: number) {
   const totalSec = Math.round(ms / 1000);
@@ -25,6 +30,7 @@ function ResultsInner() {
   const [shared, setShared] = useState(false);
   const [bestStreak, setBestStreak] = useState<number | null>(null);
   const [newSeed, setNewSeed] = useState<string>("");
+  const [rounds, setRounds] = useState<boolean[] | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && seed) {
@@ -32,6 +38,12 @@ function ResultsInner() {
     }
     setBestStreak(getBestStreak());
     setNewSeed(generateSeed());
+    // Pull per-round result for the same seed out of localStorage so we can
+    // build the Wordle-style emoji row in the share text.
+    const stored = getChallengeResult();
+    if (stored && stored.seed === seed && stored.rounds && stored.rounds.length > 0) {
+      setRounds(stored.rounds);
+    }
   }, [seed]);
 
   const verdict = useMemo(() => {
@@ -42,8 +54,11 @@ function ResultsInner() {
     return "Brutal. Try again?";
   }, [score]);
 
-  const shortText = `I got ${score}/${CHALLENGE_ROUNDS} guessing who is older than Tom Brady. Can you beat me?`;
-  const fullText = `${shortText} ${shareUrl}`;
+  const emoji = rounds ? emojiResultLine(rounds) : "";
+  const shortText = emoji
+    ? `Older Than Brady? Challenge\n${emoji}\n${score}/${CHALLENGE_ROUNDS} · ${formatElapsedShort(time)}`
+    : `I got ${score}/${CHALLENGE_ROUNDS} guessing who is older than Tom Brady. Can you beat me?`;
+  const fullText = `${shortText}\n${shareUrl}`;
 
   const writeClipboard = async (text: string) => {
     try {
@@ -107,6 +122,12 @@ function ResultsInner() {
             <span className="text-white/40 text-4xl">/{CHALLENGE_ROUNDS}</span>
           </p>
           <p className="mt-3 text-lg text-white/80">{verdict}</p>
+
+          {emoji && (
+            <div className="mt-5 mx-auto max-w-xs rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-sm leading-tight text-white/85 whitespace-pre-line text-left">
+              {`Older Than Brady? Challenge\n${emoji}\n${score}/${CHALLENGE_ROUNDS} · ${formatElapsedShort(time)}`}
+            </div>
+          )}
 
           <div className="mt-6 grid grid-cols-3 gap-2 text-sm">
             <div className="rounded-xl border border-white/10 bg-white/5 p-3">

@@ -35,6 +35,7 @@ function ChallengeInner() {
   const startRef = useRef<number | null>(null);
   const roundStartRef = useRef<number | null>(null);
   const hasStartedRef = useRef(false);
+  const roundResultsRef = useRef<boolean[]>([]);
 
   useEffect(() => {
     if (!seedFromUrl) {
@@ -60,7 +61,9 @@ function ChallengeInner() {
     setRoundElapsed(elapsed);
     setChosen(c);
     setPhase("revealing");
-    if (c === correctAnswer(current.birthDate)) setScore((s) => s + 1);
+    const correct = c === correctAnswer(current.birthDate);
+    roundResultsRef.current.push(correct);
+    if (correct) setScore((s) => s + 1);
   };
 
   const advance = () => {
@@ -73,7 +76,8 @@ function ChallengeInner() {
         score,
         total: CHALLENGE_ROUNDS,
         timeMs: elapsed,
-        completedAt: Date.now()
+        completedAt: Date.now(),
+        rounds: [...roundResultsRef.current]
       });
       track("game_finish", { mode: "challenge", score });
       router.push(`/results?seed=${seed}&score=${score}&time=${elapsed}`);

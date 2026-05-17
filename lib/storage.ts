@@ -12,6 +12,9 @@ export type StoredChallenge = {
   total: number;
   timeMs: number;
   completedAt: number;
+  // Per-round correct/incorrect, for the Wordle-style emoji share.
+  // Optional so older records keep deserializing cleanly.
+  rounds?: boolean[];
 };
 
 function safeWindow(): Window | null {

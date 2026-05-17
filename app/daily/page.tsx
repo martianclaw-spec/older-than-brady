@@ -13,6 +13,9 @@ import {
   Choice,
   correctAnswer,
   dailySeed,
+  emojiResultLine,
+  formatElapsedShort,
+  formatShortDate,
   generateSeed,
   todayDateKey
 } from "@/lib/game";
@@ -44,12 +47,22 @@ function DailyResultCard({ result }: { result: StoredChallenge }) {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
 
-  const shareText = `I got ${result.score}/${result.total} on today's Older Than Brady daily challenge. Can you beat me?`;
   const url =
     typeof window !== "undefined"
       ? `${window.location.origin}/daily`
-      : "/daily";
-  const fullText = `${shareText} ${url}`;
+      : "olderthanbrady.com/daily";
+  const dateLabel = result.completedAt
+    ? formatShortDate(new Date(result.completedAt))
+    : formatShortDate();
+  const emoji = result.rounds && result.rounds.length > 0
+    ? emojiResultLine(result.rounds)
+    : "";
+  // Wordle-style block. The emoji row carries the result; the URL goes on
+  // its own line so iMessage / Twitter previews don't compete with the grid.
+  const shareText = emoji
+    ? `Older Than Brady? · ${dateLabel}\n${emoji}\n${result.score}/${result.total} · ${formatElapsedShort(result.timeMs)}`
+    : `I got ${result.score}/${result.total} on today's Older Than Brady daily challenge.`;
+  const fullText = `${shareText}\n${url}`;
 
   const copy = async () => {
     try {
@@ -93,6 +106,13 @@ function DailyResultCard({ result }: { result: StoredChallenge }) {
     copy();
   };
 
+  // Visible preview of the emoji block so the user sees exactly what gets copied.
+  const preview = emoji ? (
+    <div className="mt-5 mx-auto max-w-xs rounded-xl border border-white/10 bg-black/30 p-3 font-mono text-sm leading-tight text-white/85 whitespace-pre-line text-left">
+      {`Older Than Brady? · ${dateLabel}\n${emoji}\n${result.score}/${result.total} · ${formatElapsedShort(result.timeMs)}`}
+    </div>
+  ) : null;
+
   return (
     <div className="flex-1 flex items-center justify-center px-5 py-8">
       <div className="max-w-md w-full text-center animate-pop glass rounded-3xl p-7">
@@ -105,6 +125,8 @@ function DailyResultCard({ result }: { result: StoredChallenge }) {
         <p className="mt-1 text-sm text-white/50">
           Done in {formatTime(result.timeMs)} · come back tomorrow for a new one
         </p>
+
+        {preview}
 
         <div className="mt-6 grid gap-3">
           <button
@@ -149,6 +171,7 @@ export default function DailyPage() {
   const startRef = useRef<number | null>(null);
   const roundStartRef = useRef<number | null>(null);
   const hasStartedRef = useRef(false);
+  const roundResultsRef = useRef<boolean[]>([]);
 
   useEffect(() => {
     const today = todayDateKey();
@@ -175,7 +198,9 @@ export default function DailyPage() {
     setRoundElapsed(elapsed);
     setChosen(c);
     setPhase("revealing");
-    if (c === correctAnswer(current.birthDate)) setScore((s) => s + 1);
+    const correct = c === correctAnswer(current.birthDate);
+    roundResultsRef.current.push(correct);
+    if (correct) setScore((s) => s + 1);
   };
 
   const advance = () => {
@@ -188,7 +213,8 @@ export default function DailyPage() {
         score,
         total: CHALLENGE_ROUNDS,
         timeMs: totalTime,
-        completedAt: Date.now()
+        completedAt: Date.now(),
+        rounds: [...roundResultsRef.current]
       };
       saveDailyResult(dateKey, result);
       setSavedResult(result);
